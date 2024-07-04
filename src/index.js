@@ -11,7 +11,7 @@ const MAPPING = Object.entries({
     portainer(event, path) {
         return {
             hostname: process.env.GPC_PORTAINER_HOST ?? 'portainer.dasred.de',
-            path:     (process.env.GPC_PORTAINER_PATH ?? '/api/stacks/webhooks') + path.split('/').pop(),
+            path:     (process.env.GPC_PORTAINER_PATH ?? '/api/stacks/webhooks/') + path.split('/').pop(),
         };
     }
 });
