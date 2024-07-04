@@ -5,7 +5,6 @@ const MAPPING = Object.entries({
         return {
             hostname: process.env.GDC_DRONE_HOST ?? 'drone.dasred.de',
             path:     process.env.GDC_DRONE_PATH ?? '/hook',
-
             //headers:  {
             //    'X-Hub-Signature':     event.headers['X-Hub-Signature'],
             //    'X-Hub-Signature-256': event.headers['X-Hub-Signature-256'],
@@ -29,8 +28,8 @@ export const handler = (event) => {
     return new Promise((resolve, reject) => {
         console.log(event);
 
-        const helper = MAPPING.find(([path]) => event.rawPath.startsWith(path)) ?? ['unknown', INVALID_MAPPING];
-        const result = helper[1](event, event.rawPath.substring(helper[0]));
+        const helper = MAPPING.find(([path]) => event.path.startsWith(path)) ?? ['unknown', INVALID_MAPPING];
+        const result = helper[1](event, event.path.substring(helper[0]));
 
         const request = https.request(
             {
