@@ -1,7 +1,7 @@
 import https from 'https';
 
 const MAPPING = Object.entries({
-    ['/drone'](event, path) {
+    ['/drone']() {
         return {
             hostname: process.env.GDC_DRONE_HOST ?? 'drone.dasred.de',
             path:     process.env.GDC_DRONE_PATH ?? '/hook',
