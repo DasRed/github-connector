@@ -24,7 +24,7 @@ export const handler = (event) => {
     return new Promise((resolve, reject) => {
         console.log(event);
 
-        const helper = MAPPING.find(([path]) => event.path?.startsWith(path));
+        const helper = MAPPING.find(([path]) => event.path.startsWith(path));
         if (helper === undefined) {
             throw new Error('Mapping not found')
         }
