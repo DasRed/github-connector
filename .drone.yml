@@ -1,0 +1,7 @@
+kind: template
+load: nodeDeployLambda.jsonnet
+data:
+    node: 20.10.0
+    lambdaFunctionName: Github-Connector
+    region: eu-west-1
+    pathDist: 'dist'

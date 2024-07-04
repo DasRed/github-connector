@@ -1,0 +1,71 @@
+import https from 'https';
+// DRONE  https://ve681stdoc.execute-api.eu-west-1.amazonaws.com/default/hook
+// PROTAINER https://portainer-hook.dasred.de/default/api/stacks/webhooks/ac076e89-062d-4588-9467-e96af1796580
+
+const MAPPING = Object.entries({
+    ['/drone'](event, path) {
+        return {
+            hostname: process.env.GDC_DRONE_HOST,
+            path:     process.env.GDC_DRONE_PATH ?? '/hook',
+            //headers:  {
+            //    'X-Hub-Signature':     event.headers['X-Hub-Signature'],
+            //    'X-Hub-Signature-256': event.headers['X-Hub-Signature-256'],
+            //}
+        };
+    },
+
+    ['/portainer'](event, path) {
+        return {
+            hostname:           process.env.GPC_PORTAINER_HOST,
+            path:               (process.env.GPC_PORTAINER_PATH ?? '/api/stacks/webhooks') + path,
+        };
+    }
+});
+
+const INVALID_MAPPING = () => throw new Error('Mapping not found');
+
+export const handler = (event) => {
+    return new Promise((resolve, reject) => {
+        console.log(event);
+        const helper = MAPPING.find(([path]) => event.rawPath.startsWith(path)) ?? ['unknown', INVALID_MAPPING];
+        const result = helper[1](event, event.rawPath.substring(helper[0]));
+
+        const request = https.request(
+            {
+                ...result,
+                port:               443,
+                method:             event.httpMethod,
+                rejectUnauthorized: false,
+                family:             6,
+                headers:            {
+                    'accept':                                 '*/*',
+                    'Content-Type':                           event.headers['Content-Type'],
+                    'X-GitHub-Delivery':                      event.headers['X-GitHub-Delivery'],
+                    'X-GitHub-Event':                         event.headers['X-GitHub-Event'],
+                    'X-GitHub-Hook-ID':                       event.headers['X-GitHub-Hook-ID'],
+                    'X-GitHub-Hook-Installation-Target-ID':   event.headers['X-GitHub-Hook-Installation-Target-ID'],
+                    'X-GitHub-Hook-Installation-Target-Type': event.headers['X-GitHub-Hook-Installation-Target-Type'],
+                    'X-Hub-Signature':                        event.headers['X-Hub-Signature'] ?? undefined,
+                    'X-Hub-Signature-256':                    event.headers['X-Hub-Signature-256'] ?? undefined,
+                }
+            },
+            (response) => {
+                let body = '';
+                response.setEncoding('utf8');
+                response.on('data', (chunk) => body += chunk);
+                response.on('end', () => {
+                    if (response.status >= 400) {
+                        return reject({
+                            statusCode: response.statusCode || 500,
+                            body:       body,
+                        });
+                    }
+
+                    resolve({statusCode: 200});
+                });
+            }
+        );
+        request.write(event.body);
+        request.end();
+    });
+};
