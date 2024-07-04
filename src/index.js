@@ -5,10 +5,6 @@ const MAPPING = Object.entries({
         return {
             hostname: process.env.GDC_DRONE_HOST ?? 'drone.dasred.de',
             path:     process.env.GDC_DRONE_PATH ?? '/hook',
-            //headers:  {
-            //    'X-Hub-Signature':     event.headers['X-Hub-Signature'],
-            //    'X-Hub-Signature-256': event.headers['X-Hub-Signature-256'],
-            //}
         };
     },
 
