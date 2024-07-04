@@ -1,10 +1,15 @@
 import https from 'https';
 
+const HEADERS = ['Content-Type', 'X-GitHub-Delivery', 'X-GitHub-Event', 'X-GitHub-Hook-ID', 'X-GitHub-Hook-Installation-Target-ID', 'X-GitHub-Hook-Installation-Target-Type', 'X-Hub-Signature', 'X-Hub-Signature-256'];
 const MAPPING = Object.entries({
     drone() {
         return {
             hostname: process.env.GDC_DRONE_HOST ?? 'drone.dasred.de',
             path:     process.env.GDC_DRONE_PATH ?? '/hook',
+            //headers:  {
+            //    'X-Hub-Signature':     event.headers['X-Hub-Signature'],
+            //    'X-Hub-Signature-256': event.headers['X-Hub-Signature-256'],
+            //}
         };
     },
     portainer(event, path) {
@@ -24,26 +29,23 @@ export const handler = (event) => {
             resolve({statusCode: 405, message: 'Mapping not found'});
             return;
         }
-        const result = helper[1](event, event.path.substring(helper[0]));
 
         const request = https.request(
             {
-                ...result,
+                ...helper[1](event, event.path.substring(helper[0])),
                 port:               443,
                 method:             event.httpMethod,
                 rejectUnauthorized: false,
                 family:             6,
-                headers:            {
-                    'accept':                                 '*/*',
-                    'Content-Type':                           event.headers['Content-Type'],
-                    'X-GitHub-Delivery':                      event.headers['X-GitHub-Delivery'],
-                    'X-GitHub-Event':                         event.headers['X-GitHub-Event'],
-                    'X-GitHub-Hook-ID':                       event.headers['X-GitHub-Hook-ID'],
-                    'X-GitHub-Hook-Installation-Target-ID':   event.headers['X-GitHub-Hook-Installation-Target-ID'],
-                    'X-GitHub-Hook-Installation-Target-Type': event.headers['X-GitHub-Hook-Installation-Target-Type'],
-                    'X-Hub-Signature':                        event.headers['X-Hub-Signature'] ?? undefined,
-                    'X-Hub-Signature-256':                    event.headers['X-Hub-Signature-256'] ?? undefined,
-                }
+                headers:            HEADERS.reduce(
+                    (acc, name) => {
+                        if (event.headers[name]) {
+                            acc[name] = event.headers[name]
+                        }
+                        return acc;
+                    },
+                    {'accept': '*/*'}
+                ),
             },
             (response) => {
                 let body = '';
