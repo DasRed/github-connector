@@ -11,7 +11,6 @@ const MAPPING = Object.entries({
             //}
         };
     },
-
     portainer(event, path) {
         return {
             hostname: process.env.GPC_PORTAINER_HOST ?? 'portainer.dasred.de',
