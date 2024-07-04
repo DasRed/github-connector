@@ -1,11 +1,9 @@
 import https from 'https';
-// DRONE  https://ve681stdoc.execute-api.eu-west-1.amazonaws.com/default/hook
-// PROTAINER https://portainer-hook.dasred.de/default/api/stacks/webhooks/ac076e89-062d-4588-9467-e96af1796580
 
 const MAPPING = Object.entries({
     ['/drone'](event, path) {
         return {
-            hostname: process.env.GDC_DRONE_HOST,
+            hostname: process.env.GDC_DRONE_HOST ?? 'drone.dasred.de',
             path:     process.env.GDC_DRONE_PATH ?? '/hook',
             //headers:  {
             //    'X-Hub-Signature':     event.headers['X-Hub-Signature'],
@@ -16,7 +14,7 @@ const MAPPING = Object.entries({
 
     ['/portainer'](event, path) {
         return {
-            hostname:           process.env.GPC_PORTAINER_HOST,
+            hostname:           process.env.GPC_PORTAINER_HOST ?? 'portainer.dasred.de',
             path:               (process.env.GPC_PORTAINER_PATH ?? '/api/stacks/webhooks') + path,
         };
     }
