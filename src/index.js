@@ -20,15 +20,14 @@ const MAPPING = Object.entries({
     }
 });
 
-function INVALID_MAPPING() {
-    throw new Error('Mapping not found')
-}
-
 export const handler = (event) => {
     return new Promise((resolve, reject) => {
         console.log(event);
 
-        const helper = MAPPING.find(([path]) => event.path.startsWith(path)) ?? ['unknown', INVALID_MAPPING];
+        const helper = MAPPING.find(([path]) => event.path.startsWith(path));
+        if (helper === undefined) {
+            throw new Error('Mapping not found')
+        }
         const result = helper[1](event, event.path.substring(helper[0]));
 
         const request = https.request(
