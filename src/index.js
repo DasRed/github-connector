@@ -14,17 +14,20 @@ const MAPPING = Object.entries({
 
     ['/portainer'](event, path) {
         return {
-            hostname:           process.env.GPC_PORTAINER_HOST ?? 'portainer.dasred.de',
-            path:               (process.env.GPC_PORTAINER_PATH ?? '/api/stacks/webhooks') + path,
+            hostname: process.env.GPC_PORTAINER_HOST ?? 'portainer.dasred.de',
+            path:     (process.env.GPC_PORTAINER_PATH ?? '/api/stacks/webhooks') + path,
         };
     }
 });
 
-const INVALID_MAPPING = () => {throw new Error('Mapping not found')};
+function INVALID_MAPPING() {
+    throw new Error('Mapping not found')
+}
 
 export const handler = (event) => {
     return new Promise((resolve, reject) => {
         console.log(event);
+
         const helper = MAPPING.find(([path]) => event.rawPath.startsWith(path)) ?? ['unknown', INVALID_MAPPING];
         const result = helper[1](event, event.rawPath.substring(helper[0]));
 
