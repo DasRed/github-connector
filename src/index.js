@@ -1,7 +1,7 @@
 import https from 'https';
 
 const MAPPING = Object.entries({
-    ['/drone']() {
+    drone() {
         return {
             hostname: process.env.GDC_DRONE_HOST ?? 'drone.dasred.de',
             path:     process.env.GDC_DRONE_PATH ?? '/hook',
@@ -12,7 +12,7 @@ const MAPPING = Object.entries({
         };
     },
 
-    ['/portainer'](event, path) {
+    portainer(event, path) {
         return {
             hostname: process.env.GPC_PORTAINER_HOST ?? 'portainer.dasred.de',
             path:     (process.env.GPC_PORTAINER_PATH ?? '/api/stacks/webhooks') + path,
@@ -24,7 +24,7 @@ export const handler = (event) => {
     return new Promise((resolve, reject) => {
         console.log(event);
 
-        const helper = MAPPING.find(([path]) => event.path.startsWith(path));
+        const helper = MAPPING.find(([path]) => event.path.startsWith('/' + path));
         if (helper === undefined) {
             throw new Error('Mapping not found')
         }
