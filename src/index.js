@@ -20,7 +20,7 @@ const MAPPING = Object.entries({
     }
 });
 
-const INVALID_MAPPING = () => throw new Error('Mapping not found');
+const INVALID_MAPPING = () => {throw new Error('Mapping not found')};
 
 export const handler = (event) => {
     return new Promise((resolve, reject) => {
