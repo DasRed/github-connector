@@ -6,10 +6,6 @@ const MAPPING = Object.entries({
         return {
             hostname: process.env.GDC_DRONE_HOST ?? 'drone.dasred.de',
             path:     process.env.GDC_DRONE_PATH ?? '/hook',
-            //headers:  {
-            //    'X-Hub-Signature':     event.headers['X-Hub-Signature'],
-            //    'X-Hub-Signature-256': event.headers['X-Hub-Signature-256'],
-            //}
         };
     },
     portainer(event, path) {
@@ -22,7 +18,7 @@ const MAPPING = Object.entries({
 
 export const handler = (event) => {
     return new Promise((resolve, reject) => {
-        console.log(event);
+        console.log('REQUEST', event);
 
         const helper = MAPPING.find(([path]) => event.path.startsWith('/' + path));
         if (helper === undefined) {
@@ -52,6 +48,7 @@ export const handler = (event) => {
                 response.setEncoding('utf8');
                 response.on('data', (chunk) => body += chunk);
                 response.on('end', () => {
+                    console.log('RESPONSE', response);
                     if (response.status >= 400) {
                         return reject({
                             statusCode: response.statusCode || 500,
