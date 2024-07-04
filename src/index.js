@@ -26,7 +26,8 @@ export const handler = (event) => {
 
         const helper = MAPPING.find(([path]) => event.path.startsWith('/' + path));
         if (helper === undefined) {
-            throw new Error('Mapping not found')
+            resolve({statusCode: 405, message: 'Mapping not found'});
+            return;
         }
         const result = helper[1](event, event.path.substring(helper[0]));
 
