@@ -1,6 +1,5 @@
 import options from '../options.js';
 
-
 class Portainer {
     /**
      *
@@ -41,6 +40,5 @@ class Portainer {
         return data.filter((stack) => stack.AutoUpdate?.Webhook).map((stack) => stack.AutoUpdate?.Webhook);
     }
 }
-
 
 export default (event) => (new Portainer(process.env.PORTAINER_HOST ?? 'portainer.dasred.de', process.env.PORTAINER_TOKEN)).createRequestOptions(event);
