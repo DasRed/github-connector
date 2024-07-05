@@ -1,0 +1,1 @@
+export default ['Content-Type', 'X-GitHub-Delivery', 'X-GitHub-Event', 'X-GitHub-Hook-ID', 'X-GitHub-Hook-Installation-Target-ID', 'X-GitHub-Hook-Installation-Target-Type', 'X-Hub-Signature', 'X-Hub-Signature-256'];
