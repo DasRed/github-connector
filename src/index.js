@@ -44,7 +44,7 @@ export const handler = async (event) => {
                             });
                         }
 
-                        resolve({statusCode: 204});
+                        resolve({statusCode: 200});
                     });
                 }
             );
@@ -53,10 +53,10 @@ export const handler = async (event) => {
         });
     }));
 
-    const resultFailed = results.find(({statusCode}) => statusCode !== 204);
+    const resultFailed = results.find(({statusCode}) => statusCode !== 200);
     if (resultFailed) {
         return resultFailed;
     }
 
-    return {statusCode: 204};
+    return {statusCode: 200};
 };
