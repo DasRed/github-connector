@@ -16,39 +16,54 @@ const MAPPING = Object.entries({
     }
 });
 
+function LOG(...args) {
+    console.log(...args);
+}
+
 export const handler = (event) => {
     return new Promise((resolve, reject) => {
-        console.log('REQUEST', event);
+        LOG('EVENT', event);
 
         const helper = MAPPING.find(([path]) => event.path.startsWith('/' + path));
         if (helper === undefined) {
+            LOG('ERROR', {statusCode: 405, message: 'Mapping not found'});
             resolve({statusCode: 405, message: 'Mapping not found'});
             return;
         }
 
-        const request = https.request(
-            {
-                ...helper[1](event, event.path.substring(helper[0])),
-                port:               443,
-                method:             event.httpMethod,
-                rejectUnauthorized: false,
-                family:             6,
-                headers:            HEADERS.reduce(
-                    (acc, name) => {
-                        if (event.headers[name]) {
-                            acc[name] = event.headers[name]
-                        }
-                        return acc;
-                    },
-                    {'accept': '*/*'}
-                ),
-            },
+        const options = {
+            ...helper[1](event, event.path.substring(helper[0])),
+            port:               443,
+            method:             event.httpMethod,
+            rejectUnauthorized: false,
+            family:             6,
+            headers:            HEADERS.reduce(
+                (acc, name) => {
+                    if (event.headers[name]) {
+                        acc[name] = event.headers[name]
+                    }
+                    return acc;
+                },
+                {'accept': '*/*'}
+            ),
+        };
+
+        LOG('REQUEST', options);
+
+        const request = https.request(options,
+            /** @param {IncomingMessage} response */
             (response) => {
                 let body = '';
                 response.setEncoding('utf8');
                 response.on('data', (chunk) => body += chunk);
                 response.on('end', () => {
-                    console.log('RESPONSE', response);
+                    LOG('RESPONSE', {
+                        statusCode:    response.statusCode || 500,
+                        statusMessage: response.statusMessage,
+                        body:          body,
+                        headers:       response.rawHeaders
+                    });
+
                     if (response.status >= 400) {
                         return reject({
                             statusCode: response.statusCode || 500,
