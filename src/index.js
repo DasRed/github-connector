@@ -11,6 +11,13 @@ const MAPPING = [
 export const handler = async (event) => {
     LOG('EVENT', event);
 
+    if (process.env.DISABLED) {
+        return {
+            statusCode: 200,
+            body: JSON.stringify(event),
+        };
+    }
+
     const helper = MAPPING.find(({path}) => event.path.startsWith('/' + path));
     if (helper === undefined) {
         LOG('ERROR', {statusCode: 405, message: 'Mapping not found'});
